@@ -1,60 +1,144 @@
 {
   "char_edits": {
-    "'": {
-      "insert": 1
-    },
-    " ": {
-      "insert": 1
-    },
     "h": {
-      "insert": 1
-    },
-    "y": {
-      "substitute": {
-        "e": 1
-      }
-    },
-    "l": {
-      "substitute": {
-        "p": 1
-      }
+      "insert": 1,
+      "reference_ct": 2,
+      "hypothesis_ct": 3,
+      "insert_rate": 0.3333333333333333
     },
     "o": {
       "delete": 3,
+      "reference_ct": 6,
+      "hypothesis_ct": 1,
       "substitute": {
-        "a": 1,
-        "r": 1
+        "a": {
+          "ct": 1,
+          "rate": 0.16666666666666666
+        },
+        "r": {
+          "ct": 1,
+          "rate": 0.16666666666666666
+        }
+      },
+      "delete_rate": 0.5
+    },
+    "w": {
+      "reference_ct": 1,
+      "hypothesis_ct": 1
+    },
+    "'": {
+      "insert": 1,
+      "hypothesis_ct": 1,
+      "insert_rate": 1.0
+    },
+    "d": {
+      "reference_ct": 1,
+      "hypothesis_ct": 1
+    },
+    " ": {
+      "insert": 1,
+      "hypothesis_ct": 1,
+      "insert_rate": 1.0
+    },
+    "e": {
+      "reference_ct": 1,
+      "hypothesis_ct": 2
+    },
+    "y": {
+      "reference_ct": 1,
+      "substitute": {
+        "e": {
+          "ct": 1,
+          "rate": 1.0
+        }
       }
+    },
+    "l": {
+      "reference_ct": 2,
+      "hypothesis_ct": 1,
+      "substitute": {
+        "p": {
+          "ct": 1,
+          "rate": 0.5
+        }
+      }
+    },
+    "p": {
+      "hypothesis_ct": 1
+    },
+    "b": {
+      "reference_ct": 1,
+      "hypothesis_ct": 2
     },
     "f": {
       "delete": 1,
+      "reference_ct": 2,
       "substitute": {
-        "b": 1
-      }
+        "b": {
+          "ct": 1,
+          "rate": 0.5
+        }
+      },
+      "delete_rate": 0.5
+    },
+    "a": {
+      "reference_ct": 1,
+      "hypothesis_ct": 2
+    },
+    "r": {
+      "reference_ct": 1,
+      "hypothesis_ct": 2
     }
   },
   "word_edits": {
     "how'd": {
-      "insert": 1
+      "insert": 1,
+      "hypothesis_ct": 1,
+      "insert_rate": 1.0
+    },
+    "he": {
+      "hypothesis_ct": 1
     },
     "howdy": {
+      "reference_ct": 1,
       "substitute": {
-        "he": 1
+        "he": {
+          "ct": 1,
+          "rate": 1.0
+        }
       }
+    },
+    "help": {
+      "hypothesis_ct": 1
     },
     "hello": {
+      "reference_ct": 1,
       "substitute": {
-        "help": 1
+        "help": {
+          "ct": 1,
+          "rate": 1.0
+        }
       }
     },
+    "bar": {
+      "hypothesis_ct": 2
+    },
     "foo": {
+      "reference_ct": 1,
       "substitute": {
-        "bar": 1
+        "bar": {
+          "ct": 1,
+          "rate": 1.0
+        }
       }
     },
     "foobar": {
+      "reference_ct": 1,
       "substitute": {
-        "bar": 1
+        "bar": {
+          "ct": 1,
+          "rate": 1.0
+        }
       }
     }
   }

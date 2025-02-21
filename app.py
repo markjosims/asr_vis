@@ -174,6 +174,35 @@ def get_edit_html(
     )
     return row
 
+def make_insert_delete_table(edit_dict):
+    table = Template("""
+<table>
+    <tr>
+        <td>String</td>
+        <td>Insert</td>
+        <td>%</td>
+        <td>Delete</td>
+        <td>%</td>
+        <td>Num Ref</td>
+        <td>Num Hyp</td>
+    </tr>
+    $table_data
+</table>
+""")
+    row = Template("""
+<tr>
+    <td>$string</td>
+    <td>$insert</td>
+    <td>$insert_rate</td>
+    <td>$delete</td>
+    <td>$delete_rate</td>
+    <td>$reference_ct</td>
+    <td>$hypothesis_ct</td>
+</tr>
+""")
+    rows = [row.safe_substitute({'string': k, **v}) for k,v in edit_dict.items()]
+    return table.substitute(table_data="\n".join(rows))
+
 # ----- #
 # script #
 # ----- #
@@ -212,6 +241,8 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
         row=get_edit_html(ref, hyp, metric=cer)
         cer_data.append(row)
         char_edits = get_edit_dict(ref, hyp, cer.alignments[0], char_edits)
+    char_edits = add_rate_keys(char_edits)
+    char_edit_table = make_insert_delete_table(char_edits)
 
     # visualize WER for each record
     wer_data = []
@@ -222,11 +253,15 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
         row=get_edit_html(ref, hyp, metric=wer)
         wer_data.append(row)
         word_edits = get_edit_dict(ref.split(), hyp.split(), wer.alignments[0], word_edits)
+    word_edits = add_rate_keys(word_edits)
+    word_edit_table = make_insert_delete_table(word_edits)
 
     # add into html header and save
     full_html = header_template.substitute(
         cer_content="\n".join(cer_data),
         wer_content="\n".join(wer_data),
+        char_edit_content=char_edit_table,
+        word_edit_content=word_edit_table,
     )
     html_out = args.html or args.input.replace('.csv', '.html')
     with open(html_out, 'w') as f:
