@@ -24,7 +24,7 @@ def edit_dict_factory():
         'delete': 0,
         'reference_ct': 0,
         'hypothesis_ct': 0,
-        'substitute': defaultdict(lambda: 0)
+        'substitute': defaultdict(lambda: {'ct': 0})
     })
 
 def get_edit_dict(
@@ -49,16 +49,17 @@ def get_edit_dict(
         # string of chars for CER or list of words for WER
         hyp_chunk = hypothesis[align.hyp_start_idx:align.hyp_end_idx]
         ref_chunk = reference[align.ref_start_idx:align.ref_end_idx]
-
-        for hyp_substr, ref_substr in zip(hyp_chunk, ref_chunk):
-            edit_dict[hyp_substr]['hypothesis_ct']+=1
-            edit_dict[ref_substr]['reference_ct']+=1
+        for hyp_substr, ref_substr in zip_longest(hyp_chunk, ref_chunk, fillvalue=None):
+            if hyp_substr:
+                edit_dict[hyp_substr]['hypothesis_ct']+=1
+            if ref_substr:
+                edit_dict[ref_substr]['reference_ct']+=1
             if align.type == 'insert':
                 edit_dict[hyp_substr]['insert']+=1
             elif align.type == 'delete':
                 edit_dict[ref_substr]['delete']+=1
             elif align.type == 'substitute':
-                edit_dict[ref_substr]['substitute'][hyp_substr]+=1
+                edit_dict[ref_substr]['substitute'][hyp_substr]['ct']+=1
     return edit_dict
 
 def merge_edit_dicts(
