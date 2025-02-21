@@ -1,16 +1,13 @@
 {
   "char_edits": {
     "'": {
-      "insert": 1,
-      "substitute": {}
+      "insert": 1
     },
     " ": {
-      "insert": 1,
-      "substitute": {}
+      "insert": 1
     },
     "h": {
-      "insert": 1,
-      "substitute": {}
+      "insert": 1
     },
     "y": {
       "substitute": {
@@ -38,8 +35,7 @@
   },
   "word_edits": {
     "how'd": {
-      "insert": 1,
-      "substitute": {}
+      "insert": 1
     },
     "howdy": {
       "substitute": {

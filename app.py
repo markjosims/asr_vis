@@ -82,7 +82,7 @@ def remove_zero_edits(d: Dict[str, Dict[str, Any]]):
     """
     for char, edits in d.items():
         for edit, val in list(edits.items()):
-            if (val==0) or (edit=='rep' and len(val)==0):
+            if (val==0) or (edit=='substitute' and len(val)==0):
                 d[char].pop(edit)
     
     return d
