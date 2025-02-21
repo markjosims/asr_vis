@@ -4,6 +4,7 @@ import csv
 import jiwer
 from collections import defaultdict
 from string import Template
+import json
 
 WORD_METRICS = ['wer', 'mer', 'wil', 'wip']
 
@@ -27,7 +28,8 @@ def edit_dict_factory():
 def get_edit_dict(
         reference: str,
         hypothesis: str,
-        alignments: List[jiwer.process.AlignmentChunk]
+        alignments: List[jiwer.process.AlignmentChunk],
+        edit_dict = None,
     ) -> Dict[
             str,
             Dict[
@@ -38,7 +40,8 @@ def get_edit_dict(
     Given a reference str, hypothesis str and jiwer character alignments,
     create a dictionary with counts of each type of edit for each unique character.
     """
-    edits = edit_dict_factory()
+    if edit_dict is None:
+        edit_dict = edit_dict_factory()
 
     ref_i = 0
     hyp_i = 0
@@ -47,20 +50,20 @@ def get_edit_dict(
         label_char = reference[ref_i] if ref_i < len(reference) else None
 
         if align.type == 'insert':
-            edits[pred_char]['insert']+=1
+            edit_dict[pred_char]['insert']+=1
             hyp_i+=1
         elif align.type == 'delete':
-            edits[label_char]['delete']+=1
+            edit_dict[label_char]['delete']+=1
             ref_i+=1
         elif align.type == 'substitute':
-            edits[label_char]['substitute'][pred_char]+=1
+            edit_dict[label_char]['substitute'][pred_char]+=1
             ref_i+=1
             hyp_i+=1
         else: 
             ref_i+=1
             hyp_i+=1
         
-    return remove_zero_edits(edits)
+    return edit_dict
 
 def merge_edit_dicts(
         main_dict: Dict[str, Dict[str, Any]],
@@ -179,19 +182,23 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
     
     # visualize CER for each record
     cer_data = []
+    char_edits = edit_dict_factory()
     for line in lines:
         ref, hyp = line[:2]
         cer = jiwer.process_characters(ref, hyp)
         row=get_edit_html(ref, hyp, metric=cer)
         cer_data.append(row)
+        char_edits = get_edit_dict(ref, hyp, cer.alignments[0], char_edits)
 
     # visualize WER for each record
     wer_data = []
+    word_edits = edit_dict_factory()
     for line in lines:
         ref, hyp = line[:2]
         wer = jiwer.process_words(ref, hyp)
         row=get_edit_html(ref, hyp, metric=wer)
         wer_data.append(row)
+        word_edits = get_edit_dict(ref, hyp, wer.alignments[0], word_edits)
 
     # add into html header and save
     full_html = header_template.substitute(
@@ -202,6 +209,12 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
     with open(html_out, 'w') as f:
         f.write(full_html)
 
+    char_edits = remove_zero_edits(char_edits)
+    word_edits = remove_zero_edits(word_edits)
+    full_json = {'char_edits': char_edits, 'word_edits': word_edits}
+    json_out = args.json or args.input.replace('.csv', '.json')
+    with open(json_out, 'w') as f:
+        json.dump(full_json, f, indent=2, ensure_ascii=False)
     return 0
 
 if __name__ == '__main__':

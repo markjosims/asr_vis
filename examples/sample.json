@@ -1,0 +1,46 @@
+{
+  "char_edits": {
+    "o": {
+      "insert": 1,
+      "substitute": {}
+    },
+    "'": {
+      "insert": 1,
+      "substitute": {}
+    },
+    "w": {
+      "substitute": {
+        "d": 1
+      }
+    },
+    "e": {
+      "substitute": {
+        "e": 1
+      }
+    },
+    "l": {
+      "delete": 1,
+      "substitute": {}
+    },
+    "f": {
+      "delete": 1,
+      "substitute": {
+        "b": 1
+      }
+    }
+  },
+  "word_edits": {
+    "h": {
+      "insert": 1,
+      "substitute": {
+        "o": 1,
+        "h": 1
+      }
+    },
+    "f": {
+      "substitute": {
+        "b": 2
+      }
+    }
+  }
+}
