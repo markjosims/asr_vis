@@ -149,6 +149,11 @@ def get_edit_html(
         metrics="\n".join(metric_html),
     )
     return row
+
+# ----- #
+# script #
+# ----- #
+
 def init_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser('Generate summary of ASR errors.')
     parser.add_argument('--input', '-i')
