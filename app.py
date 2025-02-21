@@ -1,5 +1,5 @@
 import argparse
-from typing import Optional, Sequence, Dict, Union, Any, List
+from typing import Optional, Sequence, Dict, Union, Any, List, Literal
 import csv
 import jiwer
 from collections import defaultdict
@@ -95,6 +95,7 @@ def remove_zero_edits(d: Dict[str, Dict[str, Any]]):
 def get_edit_html(
         reference: str,
         hypothesis: str,
+        metric_type: Literal['wer', 'cer']
     ):
     row = Template(f"""
 <div class ="record">
@@ -112,20 +113,29 @@ def get_edit_html(
     </table>
 </div>
     """)
-    alignments = jiwer.process_characters(reference, hypothesis).alignments[0]
+    if metric_type == 'cer':
+        alignments = jiwer.process_characters(reference, hypothesis).alignments[0]
+    else:
+        alignments = jiwer.process_words(reference, hypothesis).alignments[0]
+        reference = reference.split()
+        hypothesis = hypothesis.split()
     ref_data = []
     hyp_data = []
     for alignment in alignments:
         ref_chunk = reference[alignment.ref_start_idx:alignment.ref_end_idx]
         hyp_chunk = hypothesis[alignment.hyp_start_idx:alignment.hyp_end_idx]
-        # represent spaces as underscores for visibility
-        ref_chunk = ref_chunk.replace(' ', '_')
-        hyp_chunk = hyp_chunk.replace(' ', '_')
+        if metric_type == 'cer':
+            # represent spaces as underscores for visibility
+            ref_chunk = ref_chunk.replace(' ', '_')
+            hyp_chunk = hyp_chunk.replace(' ', '_')
+        if metric_type == 'wer':
+            # don't print a list
+            ref_chunk = ' '.join(ref_chunk)
+            hyp_chunk = ' '.join(hyp_chunk)
         ref_data.append(f"""<td class="{alignment.type}">{ref_chunk}</td>""")
         hyp_data.append(f"""<td class="{alignment.type}">{hyp_chunk}</td>""")
     row = row.substitute(ref_data="\n".join(ref_data), hyp_data="\n".join(hyp_data))
     return row
-
 def init_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser('Generate summary of ASR errors.')
     parser.add_argument('--input', '-i')
@@ -152,14 +162,24 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
         raise ValueError("Input .csv file must have header `reference,hypothesis` or `reference,hypothesis,audio`")
     
     # visualize CER for each record
-    html_chunks = []
+    cer_data = []
     for line in lines:
         ref, hyp = line[:2]
-        row=get_edit_html(ref, hyp)
-        html_chunks.append(row)
+        row=get_edit_html(ref, hyp, metric_type='cer')
+        cer_data.append(row)
+
+    # visualize WER for each record
+    wer_data = []
+    for line in lines:
+        ref, hyp = line[:2]
+        row=get_edit_html(ref, hyp, metric_type='wer')
+        wer_data.append(row)
 
     # add into html header and save
-    full_html = header_template.substitute(cer_content="\n".join(html_chunks), wer_content='TBD')
+    full_html = header_template.substitute(
+        cer_content="\n".join(cer_data),
+        wer_content="\n".join(wer_data),
+    )
     html_out = args.html or args.input.replace('.csv', '.html')
     with open(html_out, 'w') as f:
         f.write(full_html)
