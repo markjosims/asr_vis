@@ -95,8 +95,9 @@ def remove_zero_edits(d: Dict[str, Dict[str, Any]]):
 def get_edit_html(
         reference: str,
         hypothesis: str,
-        metric_type: Literal['wer', 'cer']
+        metric: Union[jiwer.process.WordOutput, jiwer.process.CharacterOutput]
     ):
+    metric_type = 'wer' if type(metric) is jiwer.process.WordOutput else 'cer'
     row = Template(f"""
 <div class ="record">
     <div class="reference">Reference: {reference}</div>
@@ -113,15 +114,13 @@ def get_edit_html(
     </table>
 </div>
     """)
-    if metric_type == 'cer':
-        alignments = jiwer.process_characters(reference, hypothesis).alignments[0]
-    else:
-        alignments = jiwer.process_words(reference, hypothesis).alignments[0]
+    if metric_type=='wer':
+        # set reference and hypothesis to lists of words rather than strs
         reference = reference.split()
         hypothesis = hypothesis.split()
     ref_data = []
     hyp_data = []
-    for alignment in alignments:
+    for alignment in metric.alignments[0]:
         ref_chunk = reference[alignment.ref_start_idx:alignment.ref_end_idx]
         hyp_chunk = hypothesis[alignment.hyp_start_idx:alignment.hyp_end_idx]
         if metric_type == 'cer':
@@ -165,14 +164,16 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
     cer_data = []
     for line in lines:
         ref, hyp = line[:2]
-        row=get_edit_html(ref, hyp, metric_type='cer')
+        cer = jiwer.process_characters(ref, hyp)
+        row=get_edit_html(ref, hyp, metric=cer)
         cer_data.append(row)
 
     # visualize WER for each record
     wer_data = []
     for line in lines:
         ref, hyp = line[:2]
-        row=get_edit_html(ref, hyp, metric_type='wer')
+        wer = jiwer.process_words(ref, hyp)
+        row=get_edit_html(ref, hyp, metric=wer)
         wer_data.append(row)
 
     # add into html header and save
