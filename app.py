@@ -43,26 +43,20 @@ def get_edit_dict(
     if edit_dict is None:
         edit_dict = edit_dict_factory()
 
-    ref_i = 0
-    hyp_i = 0
     for align in alignments:
-        pred_char = hypothesis[hyp_i] if hyp_i < len(hypothesis) else None
-        label_char = reference[ref_i] if ref_i < len(reference) else None
+        # string of chars for CER or list of words for WER
+        hyp_chunk = hypothesis[align.hyp_start_idx:align.hyp_end_idx]
+        ref_chunk = reference[align.ref_start_idx:align.ref_end_idx]
 
         if align.type == 'insert':
-            edit_dict[pred_char]['insert']+=1
-            hyp_i+=1
+            for hyp_substr in hyp_chunk:
+                edit_dict[hyp_substr]['insert']+=1
         elif align.type == 'delete':
-            edit_dict[label_char]['delete']+=1
-            ref_i+=1
+            for ref_substr in ref_chunk:
+                edit_dict[ref_substr]['delete']+=1
         elif align.type == 'substitute':
-            edit_dict[label_char]['substitute'][pred_char]+=1
-            ref_i+=1
-            hyp_i+=1
-        else: 
-            ref_i+=1
-            hyp_i+=1
-        
+            for hyp_substr, ref_substr in zip(hyp_chunk, ref_chunk):
+                edit_dict[ref_substr]['substitute'][hyp_substr]+=1
     return edit_dict
 
 def merge_edit_dicts(
@@ -198,7 +192,7 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
         wer = jiwer.process_words(ref, hyp)
         row=get_edit_html(ref, hyp, metric=wer)
         wer_data.append(row)
-        word_edits = get_edit_dict(ref, hyp, wer.alignments[0], word_edits)
+        word_edits = get_edit_dict(ref.split(), hyp.split(), wer.alignments[0], word_edits)
 
     # add into html header and save
     full_html = header_template.substitute(

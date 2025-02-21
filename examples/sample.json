@@ -1,26 +1,33 @@
 {
   "char_edits": {
-    "o": {
-      "insert": 1,
-      "substitute": {}
-    },
     "'": {
       "insert": 1,
       "substitute": {}
     },
-    "w": {
-      "substitute": {
-        "d": 1
-      }
+    " ": {
+      "insert": 1,
+      "substitute": {}
     },
-    "e": {
+    "h": {
+      "insert": 1,
+      "substitute": {}
+    },
+    "y": {
       "substitute": {
         "e": 1
       }
     },
     "l": {
-      "delete": 1,
-      "substitute": {}
+      "substitute": {
+        "p": 1
+      }
+    },
+    "o": {
+      "delete": 3,
+      "substitute": {
+        "a": 1,
+        "r": 1
+      }
     },
     "f": {
       "delete": 1,
@@ -30,16 +37,28 @@
     }
   },
   "word_edits": {
-    "h": {
+    "how'd": {
       "insert": 1,
+      "substitute": {}
+    },
+    "howdy": {
       "substitute": {
-        "o": 1,
-        "h": 1
+        "he": 1
       }
     },
-    "f": {
+    "hello": {
       "substitute": {
-        "b": 2
+        "help": 1
+      }
+    },
+    "foo": {
+      "substitute": {
+        "bar": 1
+      }
+    },
+    "foobar": {
+      "substitute": {
+        "bar": 1
       }
     }
   }
