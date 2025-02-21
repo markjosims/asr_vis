@@ -116,8 +116,13 @@ def get_edit_html(
     ref_data = []
     hyp_data = []
     for alignment in alignments:
-        ref_data.append(f"""<td class="{alignment.type}">{reference[alignment.ref_start_idx:alignment.ref_end_idx]}</td>""")
-        hyp_data.append(f"""<td class="{alignment.type}">{hypothesis[alignment.hyp_start_idx:alignment.hyp_end_idx]}</td>""")
+        ref_chunk = reference[alignment.ref_start_idx:alignment.ref_end_idx]
+        hyp_chunk = hypothesis[alignment.hyp_start_idx:alignment.hyp_end_idx]
+        # represent spaces as underscores for visibility
+        ref_chunk = ref_chunk.replace(' ', '_')
+        hyp_chunk = hyp_chunk.replace(' ', '_')
+        ref_data.append(f"""<td class="{alignment.type}">{ref_chunk}</td>""")
+        hyp_data.append(f"""<td class="{alignment.type}">{hyp_chunk}</td>""")
     row = row.substitute(ref_data="\n".join(ref_data), hyp_data="\n".join(hyp_data))
     return row
 
