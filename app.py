@@ -159,7 +159,7 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
         html_chunks.append(row)
 
     # add into html header and save
-    full_html = header_template.substitute(content="\n".join(html_chunks))
+    full_html = header_template.substitute(cer_content="\n".join(html_chunks), wer_content='TBD')
     html_out = args.html or args.input.replace('.csv', '.html')
     with open(html_out, 'w') as f:
         f.write(full_html)
