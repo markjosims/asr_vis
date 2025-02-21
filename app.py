@@ -78,6 +78,26 @@ def merge_edit_dicts(
     
     return main_dict
 
+def add_rate_keys(d: Dict[str, Dict[str, Any]]):
+    """
+    For each edit add key `{edit}_rate`.
+    - insert_rate: percent of all instances of X in hypothesis that are insertions
+    - delete_rate: percent of all instances of X in reference that were deleted in hypothesis
+    - substitute_rate: for substitution X>Y, percent of instances of X in reference
+      substituted to Y in hypothesis
+    """
+    for substr, edits in d.items():
+        hyp_ct = edits['hypothesis_ct']
+        ref_ct = edits['reference_ct']
+        insert_ct = edits['insert']
+        d[substr]['insert_rate']=insert_ct/hyp_ct if insert_ct else 0
+        delete_ct = edits['delete']
+        d[substr]['delete_rate']=delete_ct/ref_ct if delete_ct else 0
+        for hyp_substr, sub_edits in edits['substitute'].items():
+            sub_ct = sub_edits['ct']
+            d[substr]['substitute'][hyp_substr]['rate']=sub_ct/ref_ct if sub_ct else 0
+    return d
+
 def remove_zero_edits(d: Dict[str, Dict[str, Any]]):
     """
     Pop any key from edit dict if value is 0.
