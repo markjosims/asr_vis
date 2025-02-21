@@ -22,6 +22,8 @@ def edit_dict_factory():
     return defaultdict(lambda: {
         'insert': 0,
         'delete': 0,
+        'reference_ct': 0,
+        'hypothesis_ct': 0,
         'substitute': defaultdict(lambda: 0)
     })
 
@@ -48,14 +50,14 @@ def get_edit_dict(
         hyp_chunk = hypothesis[align.hyp_start_idx:align.hyp_end_idx]
         ref_chunk = reference[align.ref_start_idx:align.ref_end_idx]
 
-        if align.type == 'insert':
-            for hyp_substr in hyp_chunk:
+        for hyp_substr, ref_substr in zip(hyp_chunk, ref_chunk):
+            edit_dict[hyp_substr]['hypothesis_ct']+=1
+            edit_dict[ref_substr]['reference_ct']+=1
+            if align.type == 'insert':
                 edit_dict[hyp_substr]['insert']+=1
-        elif align.type == 'delete':
-            for ref_substr in ref_chunk:
+            elif align.type == 'delete':
                 edit_dict[ref_substr]['delete']+=1
-        elif align.type == 'substitute':
-            for hyp_substr, ref_substr in zip(hyp_chunk, ref_chunk):
+            elif align.type == 'substitute':
                 edit_dict[ref_substr]['substitute'][hyp_substr]+=1
     return edit_dict
 
