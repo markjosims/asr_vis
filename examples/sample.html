@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASR Error Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        .record {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .reference, .hypothesis {
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        td {
+            text-align: center;
+            padding: 5px;
+            font-family: monospace;
+            font-size: 18px;
+        }
+        .equal {
+            background-color: #c8e6c9;
+        }
+        .substitute {
+            background-color: #ffcc80;
+        }
+        .insert {
+            background-color: #90caf9;
+        }
+        .delete {
+            background-color: #ef9a9a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+<div class ="record">
+    <div class="reference">Reference: howdy</div>
+    <div class="reference">Hypothesis: how'd he</div>
+    <table>
+        <tr>
+            <td>Reference:</td>
+            <td class="equal">how</td>
+<td class="insert"></td>
+<td class="equal">d</td>
+<td class="insert"></td>
+<td class="substitute">y</td>
+        </tr>
+        <tr>
+            <td>Hypothesis:</td>
+            <td class="equal">how</td>
+<td class="insert">'</td>
+<td class="equal">d</td>
+<td class="insert"> h</td>
+<td class="substitute">e</td>
+        </tr>
+    </table>
+</div>
+    
+
+<div class ="record">
+    <div class="reference">Reference: hello</div>
+    <div class="reference">Hypothesis: help</div>
+    <table>
+        <tr>
+            <td>Reference:</td>
+            <td class="equal">hel</td>
+<td class="substitute">l</td>
+<td class="delete">o</td>
+        </tr>
+        <tr>
+            <td>Hypothesis:</td>
+            <td class="equal">hel</td>
+<td class="substitute">p</td>
+<td class="delete"></td>
+        </tr>
+    </table>
+</div>
+    
+
+<div class ="record">
+    <div class="reference">Reference: foo</div>
+    <div class="reference">Hypothesis: bar</div>
+    <table>
+        <tr>
+            <td>Reference:</td>
+            <td class="substitute">foo</td>
+        </tr>
+        <tr>
+            <td>Hypothesis:</td>
+            <td class="substitute">bar</td>
+        </tr>
+    </table>
+</div>
+    
+
+<div class ="record">
+    <div class="reference">Reference: foobar</div>
+    <div class="reference">Hypothesis: bar</div>
+    <table>
+        <tr>
+            <td>Reference:</td>
+            <td class="delete">foo</td>
+<td class="equal">bar</td>
+        </tr>
+        <tr>
+            <td>Hypothesis:</td>
+            <td class="delete"></td>
+<td class="equal">bar</td>
+        </tr>
+    </table>
+</div>
+    
+</div>
+
+</body>
+</html>
