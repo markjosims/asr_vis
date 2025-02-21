@@ -104,10 +104,10 @@ def remove_zero_edits(d: Dict[str, Dict[str, Any]]):
     """
     Pop any key from edit dict if value is 0.
     """
-    for char, edits in d.items():
+    for substr, edits in d.items():
         for edit, val in list(edits.items()):
             if (val==0) or (edit=='substitute' and len(val)==0):
-                d[char].pop(edit)
+                d[substr].pop(edit)
     
     return d
 
