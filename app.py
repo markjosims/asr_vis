@@ -5,6 +5,7 @@ import jiwer
 from collections import defaultdict
 from string import Template
 import json
+from itertools import zip_longest
 
 WORD_METRICS = ['wer', 'mer', 'wil', 'wip']
 
