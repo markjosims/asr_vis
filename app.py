@@ -5,6 +5,8 @@ import jiwer
 from collections import defaultdict
 from string import Template
 
+WORD_METRICS = ['wer', 'mer', 'wil', 'wip']
+
 # ----------------- #
 # edit dict helpers #
 # ----------------- #
@@ -101,7 +103,8 @@ def get_edit_html(
     row = Template(f"""
 <div class ="record">
     <div class="reference">Reference: {reference}</div>
-    <div class="reference">Hypothesis: {hypothesis}</div>
+    <div class="hypothesis">Hypothesis: {hypothesis}</div>
+    $metrics
     <table>
         <tr>
             <td>Reference:</td>
@@ -114,10 +117,20 @@ def get_edit_html(
     </table>
 </div>
     """)
+    # get overall metrics
+    metric_data = []
     if metric_type=='wer':
+        # metric list
+        for word_metric in WORD_METRICS:
+            metric_data.append((word_metric,getattr(metric, word_metric)))
         # set reference and hypothesis to lists of words rather than strs
         reference = reference.split()
         hypothesis = hypothesis.split()
+    else:
+        metric_data.append(('cer',metric.cer))
+    metric_html = [f"""<div class="metric">{name}: {val}</div>""" for name, val in metric_data]
+
+    # generate edit table
     ref_data = []
     hyp_data = []
     for alignment in metric.alignments[0]:
@@ -133,7 +146,11 @@ def get_edit_html(
             hyp_chunk = ' '.join(hyp_chunk)
         ref_data.append(f"""<td class="{alignment.type}">{ref_chunk}</td>""")
         hyp_data.append(f"""<td class="{alignment.type}">{hyp_chunk}</td>""")
-    row = row.substitute(ref_data="\n".join(ref_data), hyp_data="\n".join(hyp_data))
+    row = row.substitute(
+        ref_data="\n".join(ref_data),
+        hyp_data="\n".join(hyp_data),
+        metrics="\n".join(metric_html),
+    )
     return row
 def init_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser('Generate summary of ASR errors.')
