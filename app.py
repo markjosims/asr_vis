@@ -203,6 +203,43 @@ def make_insert_delete_table(edit_dict):
     rows = [row.safe_substitute({'string': k, **v}) for k,v in edit_dict.items()]
     return table.substitute(table_data="\n".join(rows))
 
+def make_sub_table(edit_dict):
+    """
+    Given an edit dict, return an html table where each column
+    is a unique word/char from the references, and each row is
+    a unique word/char from the hypotheses, and the cell values
+    are of the format: num (rate%).
+    """
+    table_template = Template("<table>\n$table_data\n</table>")
+    row_template = Template("<tr>$row_data</tr>")
+    ref_substrs = set()
+    hyp_substrs = set()
+    for ref_substr, edits in edit_dict.items():
+        subs = edits.get('substitute', None)
+        if not subs:
+            continue
+        ref_substrs.add(ref_substr)
+        for hyp_substr in subs.keys():
+            hyp_substrs.add(hyp_substr)
+    row_header = [f"<td>{substr}</td>" for substr in ['']+list(ref_substrs)]
+    row_header = row_template.substitute(row_data="\n".join(row_header))
+    rows = [row_header,]
+    for hyp_substr in hyp_substrs:
+        row_data = [f"<td>{hyp_substr}</td>"]
+        for ref_substr in ref_substrs:
+            sub_dict = edit_dict[ref_substr]['substitute']
+            if hyp_substr in sub_dict:
+                sub_ct = sub_dict[hyp_substr]['ct']
+                sub_rate = sub_dict[hyp_substr]['rate']
+                sub_str = f"{sub_ct} ({sub_rate*100}%)"
+            else:
+                sub_str=''
+            row_data.append(f"<td>{sub_str}</td>")
+        row_html = row_template.substitute(row_data="\n".join(row_data))
+        rows.append(row_html)
+    table = table_template.substitute(table_data="\n".join(rows))
+    return table
+
 # ----- #
 # script #
 # ----- #
@@ -243,6 +280,7 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
         char_edits = get_edit_dict(ref, hyp, cer.alignments[0], char_edits)
     char_edits = add_rate_keys(char_edits)
     char_edit_table = make_insert_delete_table(char_edits)
+    char_edit_table = char_edit_table + '\n' + make_sub_table(char_edits)
 
     # visualize WER for each record
     wer_data = []
@@ -255,6 +293,7 @@ def main(argv: Optional[Sequence[str]]=None) -> int:
         word_edits = get_edit_dict(ref.split(), hyp.split(), wer.alignments[0], word_edits)
     word_edits = add_rate_keys(word_edits)
     word_edit_table = make_insert_delete_table(word_edits)
+    word_edit_table = word_edit_table + '\n' + make_sub_table(word_edits)
 
     # add into html header and save
     full_html = header_template.substitute(
